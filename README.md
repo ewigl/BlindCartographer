@@ -1,6 +1,6 @@
 # Not That Blind Cartographer
 
-**Not That Blind Cartographer** is a lightweight quality-of-life mod for Valheim that enhances navigation, especially in "No Map" mode.
+Not That Blind Cartographer is a fork of Blind Cartographer, a lightweight quality-of-life mod for Valheim that enhances navigation, especially in "No Map" mode.
 
 ## Features
 
