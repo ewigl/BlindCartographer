@@ -1,19 +1,23 @@
-using BlindCartographer.Loader;
-using BlindCartographer.Ui;
+using NotThatBlindCartographer.Loader;
+using NotThatBlindCartographer.Ui;
 using BepInEx;
 using BepInEx.Configuration;
 using HarmonyLib;
 using UnityEngine;
 
-namespace BlindCartographer
+namespace NotThatBlindCartographer
 {
     [BepInPlugin(PluginGuid, PluginName, PluginVersion)]
-    public class BlindCartographer : BaseUnityPlugin
+    public class NotThatBlindCartographer : BaseUnityPlugin
     {
-        private const string PluginGuid = "nightkosh." + PluginName;
-        private const string PluginName = "BlindCartographer";
-        private const string PluginVersion = "1.0.3";
+        private const string PluginGuid = "ewigl." + PluginName;
+        private const string PluginName = "NotThatBlindCartographer";
+        private const string PluginVersion = "1.0.4";
         public static ConfigEntry<KeyCode> ConfigPinKey;
+        public static ConfigEntry<KeyCode> ConfigPinModifierKey;
+        public static ConfigEntry<string> ConfigPinToMapText;
+        public static ConfigEntry<string> ConfigEnterPinNameText;
+        public static ConfigEntry<string> ConfigPinAddedText;
         private static ConfigEntry<bool> _modEnabled;
         public static ConfigEntry<bool> _enableCartographyTableInNoMapMode;
         public static ConfigEntry<bool> _enableHotKey;
@@ -23,8 +27,6 @@ namespace BlindCartographer
 
         private GameObject _lastHoveredObject;
         private string _lastObjectName;
-        private bool _showPopup;
-        private string _textInput = "";
 
         public void Awake()
         {
@@ -32,11 +34,15 @@ namespace BlindCartographer
             _enableCartographyTableInNoMapMode = Config.Bind("Map", "EnableCartographyTableInNoMapMode", true, "Enable cartography table in no map mode.");
             _enableHotKey = Config.Bind("Hotkeys", "EnableHotKey", true, "Enable hot key.");
             _showHotKeyText = Config.Bind("Hotkeys", "ShowHotKeyText", true, "Show hot key text.");
-            ConfigPinKey = Config.Bind("Hotkeys", "HotKey", KeyCode.Y,
-                "Key to press with LEFT ALT to pin hovered object to the map");
+            ConfigPinKey = Config.Bind("Hotkeys", "HotKey", KeyCode.Y, "Key to press with the modifier key to pin hovered object to the map.");
+            ConfigPinModifierKey = Config.Bind("Hotkeys", "HotKeyModifier", KeyCode.LeftShift, "Modifier key to press with HotKey to pin hovered object to the map.");
+            ConfigPinToMapText = Config.Bind("Text", "TextPinToMap", "Pin to the map", "Text shown after the pin hotkey hint when hovering a pin-able object.");
+            ConfigEnterPinNameText = Config.Bind("Text", "TextEnterPinName", "Enter pin name", "Title of the pin name input dialog.");
+            ConfigPinAddedText = Config.Bind("Text", "TextPinAdded", "Pin `{pinName}` added!", "Notification shown after adding a pin. Placeholder: {pinName}.");
+
             if (_modEnabled.Value)
             {
-                Harmony = Harmony.CreateAndPatchAll(typeof(BlindCartographer).Assembly, PluginGuid);
+                Harmony = Harmony.CreateAndPatchAll(typeof(NotThatBlindCartographer).Assembly, PluginGuid);
                 HoverTextPatchLoader.ApplyPatches();
             }
         }
@@ -45,7 +51,7 @@ namespace BlindCartographer
         {
             if (!_modEnabled.Value) return;
             if (IsAnyGameUIOpen()) return;
-            if (_enableHotKey.Value && Input.GetKeyDown(ConfigPinKey.Value) && Input.GetKey(KeyCode.LeftAlt))
+            if (_enableHotKey.Value && Input.GetKeyDown(ConfigPinKey.Value) && Input.GetKey(ConfigPinModifierKey.Value))
             {
                 var player = Player.m_localPlayer;
                 if (player == null) return;
@@ -54,7 +60,7 @@ namespace BlindCartographer
 
                 TextInput.instance.RequestText(
                     new PinTextReceiver(_lastObjectName, AddToMap),
-                    "Enter pin name",
+                    ConfigEnterPinNameText.Value,
                     255
                 );
             }
@@ -104,9 +110,7 @@ namespace BlindCartographer
 
             minimap.AddPin(position, Minimap.PinType.Icon3, pinName, true, false);
 
-            Player.m_localPlayer?.Message(
-                MessageHud.MessageType.TopLeft, 
-                $"Pin `{pinName}` added!", 0, null, false);
+            Player.m_localPlayer?.Message(MessageHud.MessageType.TopLeft, ConfigPinAddedText.Value.Replace("{pinName}", pinName), 0, null, false);
         }
     }
 }

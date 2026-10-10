@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BlindCartographer.Ui
+namespace NotThatBlindCartographer.Ui
 {
     public class PinTextReceiver : TextReceiver
     {

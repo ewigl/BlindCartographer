@@ -1,12 +1,14 @@
-namespace BlindCartographer.Modifier
+namespace NotThatBlindCartographer.Modifier
 {
     public static class HoverTextModifier
     {
         public static void AddHoverText<T>(T __instance, ref string __result)
         {
-            if (!(BlindCartographer._enableHotKey.Value && BlindCartographer._showHotKeyText.Value) || 
+            if (!(NotThatBlindCartographer._enableHotKey.Value && NotThatBlindCartographer._showHotKeyText.Value) ||
                 __instance == null) return;
-            __result += $"\n[<color=yellow>LEFT ALT + {BlindCartographer.ConfigPinKey.Value}</color>] Pin to the map";
+            var pinToMapText = $"[<color=yellow>{NotThatBlindCartographer.ConfigPinModifierKey.Value} + {NotThatBlindCartographer.ConfigPinKey.Value}</color>] " +
+                               NotThatBlindCartographer.ConfigPinToMapText.Value;
+            __result += $"\n{pinToMapText}";
         }
     }
 }

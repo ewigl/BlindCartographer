@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
-using BlindCartographer.Modifier;
+using NotThatBlindCartographer.Modifier;
 using HarmonyLib;
 using UnityEngine;
 
-namespace BlindCartographer.Loader
+namespace NotThatBlindCartographer.Loader
 {
     public static class HoverTextPatchLoader
     {
@@ -36,7 +36,7 @@ namespace BlindCartographer.Loader
                 .GetMethod(nameof(HoverTextModifier.AddHoverText))
                 ?.MakeGenericMethod(type));
 
-            BlindCartographer.Harmony.Patch(method, postfix: postfix);
+            NotThatBlindCartographer.Harmony.Patch(method, postfix: postfix);
         }
     }
 }
